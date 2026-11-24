@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "hand_id": "synthetic-qq-large-open",
+  "game": "NLH_CASH",
+  "max_players": 9,
+  "small_blind": "1",
+  "big_blind": "2",
+  "players": [
+    {"player_id": "p1", "seat": 1, "position": "UTG", "starting_stack": "650"},
+    {"player_id": "p2", "seat": 2, "position": "UTG+1", "starting_stack": "650"},
+    {"player_id": "p3", "seat": 3, "position": "UTG+2", "starting_stack": "650"},
+    {"player_id": "p4", "seat": 4, "position": "LJ", "starting_stack": "650"},
+    {"player_id": "p5", "seat": 5, "position": "HJ", "starting_stack": "650"},
+    {"player_id": "p6", "seat": 6, "position": "CO", "starting_stack": "650"},
+    {"player_id": "hero", "seat": 7, "position": "BTN", "starting_stack": "650", "is_hero": true},
+    {"player_id": "p8", "seat": 8, "position": "SB", "starting_stack": "650"},
+    {"player_id": "p9", "seat": 9, "position": "BB", "starting_stack": "650"}
+  ],
+  "forced_bets": [
+    {"player_id": "p8", "type": "small_blind", "amount": "1"},
+    {"player_id": "p9", "type": "big_blind", "amount": "2"}
+  ],
+  "hero_cards": ["Qs", "Qh"],
+  "board": ["Ah", "8c", "2d"],
+  "actions": [
+    {"street": "preflop", "player_id": "p1", "type": "raise", "amount_to": "125"},
+    {"street": "preflop", "player_id": "p2", "type": "fold"},
+    {"street": "preflop", "player_id": "p3", "type": "fold"},
+    {"street": "preflop", "player_id": "p4", "type": "fold"},
+    {"street": "preflop", "player_id": "p5", "type": "fold"},
+    {"street": "preflop", "player_id": "p6", "type": "fold"},
+    {"street": "preflop", "player_id": "hero", "type": "call", "amount_to": "125"},
+    {"street": "preflop", "player_id": "p8", "type": "fold"},
+    {"street": "preflop", "player_id": "p9", "type": "fold"},
+    {"street": "flop", "player_id": "p1", "type": "bet", "amount_to": "300"},
+    {"street": "flop", "player_id": "hero", "type": "fold"}
+  ]
+}
