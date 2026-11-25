@@ -6,7 +6,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-PositiveChips = Annotated[Decimal, Field(gt=0, allow_inf_nan=False)]
+PositiveChips = Annotated[Decimal, Field(gt=0, allow_inf_nan=False, max_digits=14, decimal_places=2)]
 Card = Annotated[str, Field(pattern=r"^[2-9TJQKA][cdhs]$")]
 
 
@@ -85,7 +85,7 @@ class PokerHand(InputModel):
     forced_bets: list[ForcedBet] = Field(min_length=2, max_length=2)
     hero_cards: tuple[Card, Card]
     board: list[Card] = Field(default_factory=list, max_length=5)
-    actions: list[Action]
+    actions: list[Action] = Field(max_length=300)
 
     @model_validator(mode="after")
     def validate_hand(self) -> "PokerHand":

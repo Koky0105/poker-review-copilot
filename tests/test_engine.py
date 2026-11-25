@@ -107,7 +107,6 @@ def test_folding_to_open_returns_only_uncalled_amount(hand):
     (act("p1", "bet", "10"), "Use raise"),
     (act("p1", "raise", "3"), "minimum"),
     (act("p1", "raise", "651"), "exceeds remaining"),
-    (act("p1", "raise", "650"), "All-in actions"),
     (act("p1", "bet", "10", "flop"), "before all players"),
 ])
 def test_invalid_actions_leave_input_unchanged(hand, action, message):
@@ -156,12 +155,14 @@ def test_no_actions_after_foldout_and_no_extra_action_after_closed_round(hand):
         apply_action(preflop_end, act("p1", "check"), 3)
 
 
-def test_short_all_in_blinds_explicitly_unsupported(hand):
+def test_short_all_in_blinds_do_not_enter_action_queue(hand):
     data = json.loads(hand.model_dump_json())
     data["players"][8]["starting_stack"] = "1.5"
     data["forced_bets"][1]["amount"] = "1.5"
-    with pytest.raises(UnsupportedHandError, match="All-in blinds"):
-        initial_state(PokerHand.model_validate(data))
+    state = initial_state(PokerHand.model_validate(data))
+    assert state.remaining["p9"] == 0
+    assert "p9" not in state.pending
+    assert state.current_bet == D("2")
 
 
 def test_partial_replay_remains_incomplete(hand):
@@ -190,11 +191,12 @@ def test_folded_player_cannot_act_again(hand):
         apply_action(state, act("p1", "call", "2"), 3)
 
 
-def test_all_in_price_is_not_reported_as_an_ordinary_call(hand):
+def test_all_in_price_excludes_ineligible_unmatched_money(hand):
     state = replay_hand(hand)[-1].before
     state = replace(state, remaining={**state.remaining, "hero": D("100")})
-    with pytest.raises(UnsupportedHandError, match="side-pot"):
-        decision_metrics(state, "hero")
+    metrics = decision_metrics(state, "hero")
+    assert metrics.to_call == D("100")
+    assert metrics.call_price == D("100") / D("453")
 
 
 def test_cli_replay_reports_decision_and_uncalled_refund():
@@ -208,7 +210,7 @@ def test_cli_replay_reports_decision_and_uncalled_refund():
     assert "pot=253 refunded=300" in result.stdout
 
 
-def test_cli_unsupported_price_exits_cleanly(hand, tmp_path):
+def test_cli_short_hero_price_is_capped(hand, tmp_path):
     data = json.loads(hand.model_dump_json())
     data["players"][6]["starting_stack"] = "400"
     path = tmp_path / "short_hero.json"
@@ -217,6 +219,6 @@ def test_cli_unsupported_price_exits_cleanly(hand, tmp_path):
         [sys.executable, "-m", "poker_review", str(path), "--replay"],
         text=True, capture_output=True,
     )
-    assert result.returncode == 1
-    assert "side-pot" in result.stderr
+    assert result.returncode == 0
+    assert "to_call=275 call_price=34.25%" in result.stdout
     assert "Traceback" not in result.stderr
