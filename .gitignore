@@ -151,6 +151,12 @@ activemq-data/
 
 # Environments
 .env
+.local/
+node_modules/
+test-results/
+playwright-report/
+.env.*
+!.env.example
 .envrc
 .venv
 env/
